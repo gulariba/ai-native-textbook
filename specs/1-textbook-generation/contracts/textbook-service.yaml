@@ -1,0 +1,323 @@
+# API Contract: Textbook Service
+
+**Version**: 1.0  
+**Date**: 2025-12-08  
+**Service**: Textbook Content Management
+
+## Overview
+
+This document defines the API contract for the textbook content management service, which handles textbook chapters, exercises, and content delivery with personalization.
+
+## Base URL
+
+`https://api.textbook.example.com/v1/textbook`
+
+## Authentication
+
+All endpoints require a valid JWT token in the Authorization header:
+
+```
+Authorization: Bearer <jwt-token>
+```
+
+## Common Headers
+
+- `Content-Type`: `application/json`
+- `Accept`: `application/json`
+- `X-User-Context`: JSON string with user preferences (background, language, etc.)
+
+## Common Response Format
+
+All API responses follow this structure:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "message": "Optional descriptive message",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+For errors, the structure is:
+
+```json
+{
+  "success": false,
+  "data": null,
+  "message": "Descriptive error message",
+  "error": {
+    "type": "ERROR_TYPE",
+    "code": "ERROR_CODE",
+    "details": {}
+  },
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+## Endpoints
+
+### GET /chapters
+
+Retrieve a list of available textbook chapters, with optional filtering and personalization.
+
+#### Query Parameters
+
+- `limit` (optional, integer, default: 20): Number of chapters to return
+- `offset` (optional, integer, default: 0): Offset for pagination
+- `category` (optional, string): Filter by chapter category
+- `difficulty` (optional, string): Filter by difficulty level (beginner, intermediate, advanced)
+- `personalized` (optional, boolean, default: false): Apply personalization based on user profile
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "chapters": [
+      {
+        "id": "ch-physical-fundamentals",
+        "title": "Physical AI Fundamentals",
+        "description": "Introduction to the core concepts of Physical AI",
+        "difficultyLevel": "beginner",
+        "estimatedReadingTime": 30,
+        "topics": ["definition", "applications", "history"],
+        "exercisesCount": 5,
+        "language": "en",
+        "urduAvailable": true,
+        "personalized": true,
+        "userProgress": 0.5
+      }
+    ],
+    "pagination": {
+      "limit": 20,
+      "offset": 0,
+      "total": 1,
+      "hasNext": false,
+      "hasPrevious": false
+    }
+  },
+  "message": "Chapters retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### GET /chapters/{chapterId}
+
+Retrieve a specific textbook chapter with its content.
+
+#### Path Parameters
+
+- `chapterId` (required, string): Unique identifier of the chapter
+
+#### Query Parameters
+
+- `language` (optional, string, default: "en"): Language code ("en" or "ur")
+- `personalize` (optional, boolean, default: true): Apply personalization to the content
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "chapter": {
+      "id": "ch-physical-fundamentals",
+      "title": "Physical AI Fundamentals",
+      "content": "# Physical AI Fundamentals\n\nPhysical AI is a branch of artificial intelligence that...",
+      "contentType": "text",
+      "difficultyLevel": "beginner",
+      "topics": ["definition", "applications", "history"],
+      "exercises": [
+        {
+          "id": "ex-1",
+          "type": "multiple-choice",
+          "question": "What is Physical AI?",
+          "options": ["Option A", "Option B", "Option C", "Option D"],
+          "answer": "Option A"
+        }
+      ],
+      "examples": [
+        {
+          "id": "exmpl-1",
+          "title": "Example of Physical AI",
+          "code": "def example():\n    return 'Hello Physical AI'",
+          "description": "Simple example of Physical AI implementation"
+        }
+      ],
+      "language": "en",
+      "urduTranslation": "# مادی ای آئی کے فنڈامینٹلز\n\nمادی ای آئی مصنوعی ذہانت کی ایک شاخ ہے...",
+      "createdAt": "2025-12-01T10:00:00Z",
+      "updatedAt": "2025-12-07T15:30:00Z",
+      "personalized": true
+    }
+  },
+  "message": "Chapter retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /chapters
+
+Create a new textbook chapter.
+
+#### Request Body
+
+```json
+{
+  "title": "Advanced Locomotion in Humanoid Robots",
+  "content": "# Advanced Locomotion\n\nThis chapter covers advanced locomotion techniques...",
+  "difficultyLevel": "advanced",
+  "topics": ["locomotion", "balance", "gait"],
+  "language": "en",
+  "exercises": [
+    {
+      "type": "coding",
+      "question": "Implement a basic walking gait for a humanoid robot",
+      "solution": "def walking_gait():\n    # Implementation here\n    pass"
+    }
+  ]
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "chapter": {
+      "id": "ch-locomotion-advanced",
+      "title": "Advanced Locomotion in Humanoid Robots",
+      "content": "# Advanced Locomotion\n\nThis chapter covers advanced locomotion techniques...",
+      "difficultyLevel": "advanced",
+      "topics": ["locomotion", "balance", "gait"],
+      "exercises": [
+        {
+          "id": "ex-5",
+          "type": "coding",
+          "question": "Implement a basic walking gait for a humanoid robot",
+          "solution": "def walking_gait():\n    # Implementation here\n    pass"
+        }
+      ],
+      "language": "en",
+      "createdAt": "2025-12-08T10:00:00Z",
+      "updatedAt": "2025-12-08T10:00:00Z"
+    }
+  },
+  "message": "Chapter created successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### PUT /chapters/{chapterId}
+
+Update an existing textbook chapter.
+
+#### Path Parameters
+
+- `chapterId` (required, string): Unique identifier of the chapter
+
+#### Request Body
+
+Same structure as POST /chapters, but all fields are optional.
+
+#### Response
+
+Same as GET /chapters/{chapterId}.
+
+### DELETE /chapters/{chapterId}
+
+Delete a textbook chapter.
+
+#### Path Parameters
+
+- `chapterId` (required, string): Unique identifier of the chapter
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "ch-physical-fundamentals"
+  },
+  "message": "Chapter deleted successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /chapters/{chapterId}/translate
+
+Request translation of a chapter to Urdu.
+
+#### Path Parameters
+
+- `chapterId` (required, string): Unique identifier of the chapter
+
+#### Request Body
+
+```json
+{
+  "targetLanguage": "ur"
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "taskId": "translate-task-123",
+    "status": "processing",
+    "chapterId": "ch-physical-fundamentals",
+    "targetLanguage": "ur"
+  },
+  "message": "Translation requested successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### GET /chapters/{chapterId}/translation-status/{taskId}
+
+Check the status of a translation task.
+
+#### Path Parameters
+
+- `chapterId` (required, string): Unique identifier of the chapter
+- `taskId` (required, string): Unique identifier of the translation task
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "taskId": "translate-task-123",
+    "status": "completed",
+    "progress": 100,
+    "chapterId": "ch-physical-fundamentals",
+    "targetLanguage": "ur",
+    "translatedContent": "# مادی ای آئی کے فنڈامینٹلز\n\nمادی ای آئی مصنوعی ذہانت کی ایک شاخ ہے..."
+  },
+  "message": "Translation status retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+## Error Codes
+
+- `TBK_001`: Chapter not found
+- `TBK_002`: Invalid chapter data
+- `TBK_003`: Translation not available
+- `TBK_004`: User not authorized for this action
+- `TBK_005`: Content generation failed
