@@ -1,0 +1,516 @@
+# API Contract: Personalization Service
+
+**Version**: 1.0  
+**Date**: 2025-12-08  
+**Service**: User Profile and Content Personalization
+
+## Overview
+
+This document defines the API contract for the personalization service, which manages user profiles and adapts textbook content based on user background, preferences, and learning progress.
+
+## Base URL
+
+`https://api.textbook.example.com/v1/personalization`
+
+## Authentication
+
+All endpoints require a valid JWT token in the Authorization header:
+
+```
+Authorization: Bearer <jwt-token>
+```
+
+## Common Headers
+
+- `Content-Type`: `application/json`
+- `Accept`: `application/json`
+
+## Common Response Format
+
+All API responses follow this structure:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "message": "Optional descriptive message",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+For errors, the structure is:
+
+```json
+{
+  "success": false,
+  "data": null,
+  "message": "Descriptive error message",
+  "error": {
+    "type": "ERROR_TYPE",
+    "code": "ERROR_CODE",
+    "details": {}
+  },
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+## Endpoints
+
+### GET /profile
+
+Retrieve the current user's profile information.
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "profile": {
+      "id": "user-12345",
+      "background": "intermediate",
+      "learningGoals": ["understand_robotics", "implement_control_systems"],
+      "preferredLanguage": "en",
+      "translationEnabled": true,
+      "learningStyle": "visual",
+      "technicalDepthPreference": "balanced",
+      "createdAt": "2025-12-01T10:00:00Z",
+      "updatedAt": "2025-12-08T09:30:00Z",
+      "learningProgress": {
+        "completedChapters": 3,
+        "totalChapters": 10,
+        "averageQuizScore": 0.78,
+        "timeSpent": 245  // in minutes
+      }
+    }
+  },
+  "message": "User profile retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### PUT /profile
+
+Update the current user's profile information.
+
+#### Request Body
+
+```json
+{
+  "background": "advanced",
+  "learningGoals": ["understand_robotics", "implement_control_systems", "master_locomotion"],
+  "preferredLanguage": "ur",
+  "translationEnabled": true,
+  "learningStyle": "hands-on",
+  "technicalDepthPreference": "detailed"
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "profile": {
+      "id": "user-12345",
+      "background": "advanced",
+      "learningGoals": ["understand_robotics", "implement_control_systems", "master_locomotion"],
+      "preferredLanguage": "ur",
+      "translationEnabled": true,
+      "learningStyle": "hands-on",
+      "technicalDepthPreference": "detailed",
+      "createdAt": "2025-12-01T10:00:00Z",
+      "updatedAt": "2025-12-08T10:00:00Z",
+      "learningProgress": {
+        "completedChapters": 3,
+        "totalChapters": 10,
+        "averageQuizScore": 0.78,
+        "timeSpent": 245
+      }
+    }
+  },
+  "message": "User profile updated successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### GET /preferences
+
+Retrieve the current user's content preferences.
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "preferences": {
+      "difficultyAdaptation": true,
+      "examplePreference": "practical",
+      "diagramPreference": "detailed",
+      "quizFrequency": "after-section",
+      "contentLengthPreference": "medium",
+      "notificationSettings": {
+        "newContent": true,
+        "progressUpdates": true,
+        "reminders": false
+      }
+    }
+  },
+  "message": "User preferences retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### PUT /preferences
+
+Update the current user's content preferences.
+
+#### Request Body
+
+```json
+{
+  "difficultyAdaptation": true,
+  "examplePreference": "theoretical",
+  "diagramPreference": "simplified",
+  "quizFrequency": "after-chapter",
+  "contentLengthPreference": "short",
+  "notificationSettings": {
+    "newContent": true,
+    "progressUpdates": false,
+    "reminders": true
+  }
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "preferences": {
+      "difficultyAdaptation": true,
+      "examplePreference": "theoretical",
+      "diagramPreference": "simplified",
+      "quizFrequency": "after-chapter",
+      "contentLengthPreference": "short",
+      "notificationSettings": {
+        "newContent": true,
+        "progressUpdates": false,
+        "reminders": true
+      }
+    }
+  },
+  "message": "User preferences updated successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### GET /learning-progress
+
+Retrieve the current user's learning progress and analytics.
+
+#### Query Parameters
+
+- `chapterId` (optional, string): Filter progress for specific chapter
+- `startDate` (optional, string, ISO 8601): Filter from this date
+- `endDate` (optional, string, ISO 8601): Filter until this date
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "progress": {
+      "overall": {
+        "completedChapters": 3,
+        "totalChapters": 10,
+        "completionPercentage": 30,
+        "averageQuizScore": 0.78,
+        "timeSpent": 245  // in minutes
+      },
+      "byChapter": [
+        {
+          "chapterId": "ch-physical-fundamentals",
+          "title": "Physical AI Fundamentals",
+          "completed": true,
+          "completionPercentage": 100,
+          "timeSpent": 45,
+          "quizScore": 0.85,
+          "lastAccessed": "2025-12-05T14:30:00Z"
+        },
+        {
+          "chapterId": "ch-humanoid-components",
+          "title": "Humanoid Robot Components",
+          "completed": false,
+          "completionPercentage": 60,
+          "timeSpent": 75,
+          "quizScore": null,
+          "lastAccessed": "2025-12-07T11:15:00Z"
+        }
+      ],
+      "recommendations": [
+        {
+          "chapterId": "ch-kinematics",
+          "title": "Robot Kinematics",
+          "reason": "Prerequisite for next chapter",
+          "priority": "high"
+        }
+      ]
+    }
+  },
+  "message": "Learning progress retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /learning-progress/{chapterId}
+
+Update learning progress for a specific chapter.
+
+#### Path Parameters
+
+- `chapterId` (required, string): Unique identifier of the chapter
+
+#### Request Body
+
+```json
+{
+  "progressPercentage": 75,
+  "timeSpent": 30,  // in minutes
+  "quizScore": 0.82,
+  "completed": false
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "progress": {
+      "chapterId": "ch-kinematics",
+      "progressPercentage": 75,
+      "timeSpent": 30,
+      "quizScore": 0.82,
+      "completed": false,
+      "updatedAt": "2025-12-08T10:00:00Z"
+    }
+  },
+  "message": "Learning progress updated successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### GET /personalized-content/{chapterId}
+
+Retrieve a chapter with personalization applied based on user profile.
+
+#### Path Parameters
+
+- `chapterId` (required, string): Unique identifier of the chapter
+
+#### Query Parameters
+
+- `language` (optional, string, default: "en"): Language code ("en" or "ur")
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "chapter": {
+      "id": "ch-kinematics",
+      "title": "Robot Kinematics",
+      "content": "# Robot Kinematics for Advanced Learners\n\nSince you have a strong background in robotics, we'll dive directly into advanced kinematic equations...",
+      "difficultyLevel": "advanced", // Adjusted based on user profile
+      "examples": [
+        {
+          "id": "exmpl-1",
+          "type": "practical",
+          "title": "Industrial Application",
+          "description": "Practical example relevant to your interest in industrial robotics"
+        }
+      ],
+      "exercises": [
+        {
+          "id": "ex-1",
+          "difficulty": "advanced",  // Adjusted based on user profile
+          "question": "Derive the Jacobian matrix for the given robotic arm configuration...",
+          "solution": "The solution involves complex mathematical derivation..."
+        }
+      ],
+      "personalizationApplied": true,
+      "adaptationReasons": [
+        "Increased difficulty based on user's advanced background",
+        "Focused on practical examples per user preference",
+        "Extended mathematical explanations per user preference"
+      ],
+      "language": "en",
+      "urduTranslation": "# روبوٹ کنیمیٹکس\n\nچونکہ آپ روبوٹکس میں مضبوط پس منظر رکھتے ہیں، ہم جامع کنیمیٹک مساوات میں سیدھے طور پر..."
+    }
+  },
+  "message": "Personalized chapter content retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /recommendations
+
+Get personalized content recommendations based on user profile and progress.
+
+#### Request Body
+
+```json
+{
+  "context": "next-chapter",  // or "review", "advanced-topic", "supplementary"
+  "count": 5
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "recommendations": [
+      {
+        "id": "ch-dynamics",
+        "title": "Robot Dynamics",
+        "type": "chapter",
+        "reason": "Next logical topic after kinematics",
+        "estimatedTime": 45,
+        "difficulty": "advanced",
+        "relevanceScore": 0.95,
+        "prerequisitesMet": true
+      },
+      {
+        "id": "ex-kinematics-practice",
+        "title": "Kinematics Practice Problems",
+        "type": "exercise-set",
+        "reason": "To reinforce kinematics concepts",
+        "estimatedTime": 30,
+        "relevanceScore": 0.87
+      }
+    ]
+  },
+  "message": "Personalized recommendations generated successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /adaptive-assessment
+
+Generate adaptive assessment questions based on user's knowledge level.
+
+#### Request Body
+
+```json
+{
+  "chapterId": "ch-kinematics",
+  "questionCount": 5,
+  "difficultyRange": ["intermediate", "advanced"],
+  "questionTypes": ["multiple-choice", "coding"]
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "assessment": {
+      "id": "assessment-kinematics-123",
+      "chapterId": "ch-kinematics",
+      "questions": [
+        {
+          "id": "q1",
+          "type": "multiple-choice",
+          "difficulty": "intermediate",
+          "question": "What is the primary purpose of inverse kinematics?",
+          "options": [
+            "A) To calculate joint angles from end-effector position",
+            "B) To calculate end-effector position from joint angles", 
+            "C) To control robot speed",
+            "D) To optimize energy consumption"
+          ],
+          "explanation": "Inverse kinematics is used to determine the joint parameters that achieve a desired position of the end-effector."
+        },
+        {
+          "id": "q2",
+          "type": "coding",
+          "difficulty": "advanced",
+          "question": "Implement a function to calculate the Jacobian matrix for a 3-DOF planar manipulator",
+          "starterCode": "def calculate_jacobian(angles):\n    # Implement the Jacobian calculation\n    pass",
+          "solution": "def calculate_jacobian(angles):\n    # Solution implementation\n    pass",
+          "explanation": "The Jacobian matrix relates joint velocities to end-effector velocities."
+        }
+      ]
+    }
+  },
+  "message": "Adaptive assessment generated successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /feedback/personalization
+
+Submit feedback on personalization effectiveness.
+
+#### Request Body
+
+```json
+{
+  "chapterId": "ch-kinematics",
+  "contentDifficultyRating": 4,  // 1-5 scale
+  "exampleRelevanceRating": 5,
+  "personalizationHelpfulness": 4,
+  "suggestions": "The content was appropriately challenging but could use more visual diagrams per my learning style preference.",
+  "requestedChanges": {
+    "increaseVisualContent": true,
+    "adjustDifficulty": "slightly-easier"
+  }
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "feedbackId": "pfb-98765"
+  },
+  "message": "Personalization feedback submitted successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+## Error Codes
+
+- `PER_001`: User profile not found
+- `PER_002`: Invalid profile data
+- `PER_003`: Learning progress not found
+- `PER_004`: Invalid progress data
+- `PER_005`: Personalization engine error
+- `PER_006`: Recommendation generation failed
+- `PER_007`: Assessment generation failed
+- `PER_008`: User not authorized

@@ -76,18 +76,82 @@ ipython_config.py
 venv/
 env/
 ENV/
+.venv/
 env.bak/
-venv.bak/
-.scrapy
-.spyderproject
-.spyproject
-.ropeproject
+.ENV/
+.ENV.bak/
+.python-version
+.pytest_cache/
+.coverage
+htmlcov/
 .pyre/
 .mypy_cache/
-.dmypy.json
-dmypy.json
-chatbot.db
-*.db-journal
+.hypothesis/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# FastAPI/Backend
+*.log
 logs/
-tmp/
-temp/
+log/
+*.db
+*.db-journal
+local_settings.py
+db.sqlite3
+.dbshell_history
+celerybeat-schedule
+celerybeat.pid
+
+# Vector DB
+chroma/
+chroma_data/
+chromadb/
+*.chroma/
+
+# Environment
+.env*
+.env.local
+.env.dev
+.env.test
+.env.prod
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Node.js/JavaScript Frontend
+node_modules/
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+/dist
+/build
+/.cache
+.nyc_output
+coverage/
+.nyc_output/
+coverage-final.json
+
+# Vite
+.vite/
+
+# React
+*.hot-update.json
+*.hot-update.js
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

@@ -1,0 +1,398 @@
+# API Contract: RAG (Retrieval-Augmented Generation) Service
+
+**Version**: 1.0  
+**Date**: 2025-12-08  
+**Service**: RAG Chatbot for Textbook Content
+
+## Overview
+
+This document defines the API contract for the RAG (Retrieval-Augmented Generation) service, which powers the chatbot functionality that answers questions based on textbook content. The service retrieves relevant content from the knowledge base and generates contextual responses.
+
+## Base URL
+
+`https://api.textbook.example.com/v1/rag`
+
+## Authentication
+
+All endpoints require a valid JWT token in the Authorization header:
+
+```
+Authorization: Bearer <jwt-token>
+```
+
+## Common Headers
+
+- `Content-Type`: `application/json`
+- `Accept`: `application/json`
+- `X-User-Context`: JSON string with user preferences (background, language, etc.)
+
+## Common Response Format
+
+All API responses follow this structure:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "message": "Optional descriptive message",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+For errors, the structure is:
+
+```json
+{
+  "success": false,
+  "data": null,
+  "message": "Descriptive error message",
+  "error": {
+    "type": "ERROR_TYPE",
+    "code": "ERROR_CODE",
+    "details": {}
+  },
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+## Endpoints
+
+### POST /query
+
+Submit a question to the RAG system and receive an AI-generated response based on textbook content.
+
+#### Request Body
+
+```json
+{
+  "query": "What are the key components of a humanoid robot?",
+  "chapterId": "ch-humanoid-components",  // Optional: restrict to specific chapter
+  "context": {  // Optional: additional context for personalization
+    "userBackground": "beginner",
+    "preference": "detailed-explanation",
+    "language": "en"
+  },
+  "includeSources": true,  // Optional: include source references in response
+  "maxTokens": 500  // Optional: limit response length
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "response": "A humanoid robot typically consists of several key components including: 1) Mechanical structure with joints and actuators, 2) Sensors for perception, 3) Control systems for movement coordination, 4) Power systems for operation, and 5) AI systems for decision making.",
+    "confidence": 0.92,
+    "sources": [
+      {
+        "chapterId": "ch-humanoid-components",
+        "chapterTitle": "Humanoid Robot Components",
+        "section": "Introduction",
+        "relevanceScore": 0.89
+      }
+    ],
+    "queryId": "qry-1234567890",
+    "timestamp": "2025-12-08T10:00:00Z"
+  },
+  "message": "Query processed successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /query/stream
+
+Submit a question to the RAG system and receive a streaming response (Server-Sent Events).
+
+#### Request Body
+
+Same as POST /query.
+
+#### Response
+
+Server-Sent Events (SSE) with JSON data chunks:
+
+```
+data: {"token": "A", "index": 0}
+data: {"token": " humanoid", "index": 1}
+data: {"token": " robot", "index": 2}
+...
+data: {"done": true, "response": "Full response text", "sources": [...]}
+```
+
+### POST /validate
+
+Validate a query before full processing to check if it can be answered with available knowledge.
+
+#### Request Body
+
+```json
+{
+  "query": "How does inverse kinematics work in robotic arms?",
+  "chapterId": "ch-kinematics"  // Optional: restrict to specific chapter
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "canAnswer": true,
+    "confidence": 0.85,
+    "relevantContentCount": 3,
+    "estimatedResponseTime": 1.2
+  },
+  "message": "Query validated successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /feedback
+
+Submit feedback on a RAG response to improve the system.
+
+#### Request Body
+
+```json
+{
+  "queryId": "qry-1234567890",
+  "rating": 5,  // 1-5 star rating
+  "useful": true,  // Whether the response was useful
+  "accurate": true,  // Whether the response was accurate
+  "comment": "The response was very detailed and helpful in understanding the concept.",
+  "correctAnswer": "Optional correct answer if the response was inaccurate"
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "feedbackId": "fdbk-9876543210"
+  },
+  "message": "Feedback submitted successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### GET /sessions
+
+Retrieve a list of recent RAG sessions for the user.
+
+#### Query Parameters
+
+- `limit` (optional, integer, default: 20): Number of sessions to return
+- `offset` (optional, integer, default: 0): Offset for pagination
+- `startDate` (optional, string, ISO 8601): Filter sessions from this date
+- `endDate` (optional, string, ISO 8601): Filter sessions until this date
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "sessions": [
+      {
+        "sessionId": "sess-abc123",
+        "createdAt": "2025-12-08T09:30:00Z",
+        "lastQueryAt": "2025-12-08T09:45:00Z",
+        "queryCount": 5,
+        "topic": "Humanoid Robot Components"
+      }
+    ],
+    "pagination": {
+      "limit": 20,
+      "offset": 0,
+      "total": 1,
+      "hasNext": false,
+      "hasPrevious": false
+    }
+  },
+  "message": "Sessions retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### GET /sessions/{sessionId}
+
+Retrieve details of a specific RAG session.
+
+#### Path Parameters
+
+- `sessionId` (required, string): Unique identifier of the session
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "session": {
+      "sessionId": "sess-abc123",
+      "createdAt": "2025-12-08T09:30:00Z",
+      "lastQueryAt": "2025-12-08T09:45:00Z",
+      "queryCount": 5,
+      "topic": "Humanoid Robot Components",
+      "queries": [
+        {
+          "queryId": "qry-111",
+          "query": "What are the main components?",
+          "response": "A humanoid robot typically consists of...",
+          "timestamp": "2025-12-08T09:31:00Z"
+        }
+      ]
+    }
+  },
+  "message": "Session retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /sessions/{sessionId}/queries
+
+Add a query to an existing session.
+
+#### Path Parameters
+
+- `sessionId` (required, string): Unique identifier of the session
+
+#### Request Body
+
+Same as POST /query.
+
+#### Response
+
+Same as POST /query.
+
+### POST /index
+
+Add or update content in the RAG knowledge base.
+
+#### Request Body
+
+```json
+{
+  "chapterId": "ch-new-chapter",
+  "content": "This is the new chapter content to be indexed for RAG queries...",
+  "metadata": {
+    "title": "New Chapter Title",
+    "author": "Author Name",
+    "tags": ["robotics", "ai", "textbook"],
+    "difficulty": "intermediate"
+  },
+  "language": "en"
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "taskId": "index-task-123",
+    "status": "processing",
+    "chapterId": "ch-new-chapter"
+  },
+  "message": "Content indexing initiated successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### POST /index/batch
+
+Add or update multiple content pieces in the RAG knowledge base.
+
+#### Request Body
+
+```json
+{
+  "contents": [
+    {
+      "chapterId": "ch-chapter-1",
+      "content": "Content of chapter 1...",
+      "metadata": {
+        "title": "Chapter 1 Title",
+        "difficulty": "beginner"
+      },
+      "language": "en"
+    },
+    {
+      "chapterId": "ch-chapter-2",
+      "content": "Content of chapter 2...",
+      "metadata": {
+        "title": "Chapter 2 Title",
+        "difficulty": "intermediate"
+      },
+      "language": "en"
+    }
+  ]
+}
+```
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "taskId": "batch-index-task-456",
+    "status": "processing",
+    "totalItems": 2,
+    "processedItems": 0
+  },
+  "message": "Batch content indexing initiated successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+### GET /index-status/{taskId}
+
+Check the status of a content indexing task.
+
+#### Path Parameters
+
+- `taskId` (required, string): Unique identifier of the indexing task
+
+#### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "taskId": "index-task-123",
+    "status": "completed",
+    "progress": 100,
+    "chapterId": "ch-new-chapter",
+    "indexedChunks": 15,
+    "errors": []
+  },
+  "message": "Indexing status retrieved successfully",
+  "error": null,
+  "timestamp": "2025-12-08T10:00:00Z"
+}
+```
+
+## Error Codes
+
+- `RAG_001`: Invalid query format
+- `RAG_002`: No relevant content found
+- `RAG_003`: Content generation failed
+- `RAG_004`: Rate limit exceeded
+- `RAG_005`: Session not found
+- `RAG_006`: Indexing failed
+- `RAG_007`: Service temporarily unavailable
