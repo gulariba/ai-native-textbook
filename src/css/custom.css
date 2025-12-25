@@ -20,7 +20,9 @@
 
 /* Typography */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Code Pro:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
 
 /* Layout */
 html {
@@ -665,6 +667,57 @@ table {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+/* Urdu Typography */
+:lang(ur) {
+  --ifm-font-family-base: 'Noto Nastaliq Urdu', 'Amiri', serif;
+  font-size: 1.1rem;
+  line-height: 2.2;
+}
+
+/* RTL Support for Urdu */
+[dir="rtl"] {
+  text-align: right;
+}
+
+/* Ensure proper RTL layout for main elements */
+[dir="rtl"] .navbar {
+  text-align: right;
+}
+
+[dir="rtl"] .menu__list-item,
+[dir="rtl"] .menu__link {
+  text-align: right;
+}
+
+[dir="rtl"] .pagination-nav__label {
+  text-align: right;
+}
+
+[dir="rtl"] .pagination-nav__sublabel {
+  text-align: right;
+}
+
+/* RTL adjustments for layout */
+[dir="rtl"] .menu__list-item > .menu__list {
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+[dir="rtl"] .markdown blockquote {
+  border-left: none;
+  border-right: 4px solid var(--ifm-color-primary);
+  padding-left: 0;
+  padding-right: 1.5rem;
+}
+
+[dir="rtl"] .markdown a::after {
+  transform-origin: left;
+}
+
+[dir="rtl"] .markdown a:hover::after {
+  transform-origin: right;
 }
 
 /* Ensure chat widget appears above all elements */

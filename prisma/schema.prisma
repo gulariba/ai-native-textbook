@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  firstName     String?
+  lastName      String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Custom fields for our application
+  softwareLevel String?  // Beginner, Intermediate, Advanced
+  programmingLanguages String?  // JSON string of selected languages
+  deviceType    String?  // Laptop, Desktop, Mobile
+  ramSize       String?  // e.g., "8GB", "16GB", etc.
+}

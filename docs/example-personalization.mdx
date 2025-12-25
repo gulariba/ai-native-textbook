@@ -1,0 +1,46 @@
+---
+sidebar_position: 1
+---
+
+# Example: Personalized Content
+
+This is an example page demonstrating how content personalization works in our AI Native textbook.
+
+<ContentPersonalizer
+  beginnerContent={
+    <div>
+      <h2>Getting Started with AI Concepts</h2>
+      <p>Welcome! If you're new to AI, this section will introduce you to the fundamental concepts in simple terms.</p>
+      <p>Artificial Intelligence (AI) is essentially about creating computer systems that can perform tasks that typically require human intelligence. Think of how you might recognize a friend's face in a crowd or understand what someone is saying - these are examples of intelligence that we're trying to replicate in machines.</p>
+      <ul>
+        <li>AI is about making computers smart</li>
+        <li>It helps machines understand and respond to the world</li>
+        <li>Common examples include voice assistants and recommendation systems</li>
+      </ul>
+    </div>
+  }
+  intermediateContent={
+    <div>
+      <h2>AI Fundamentals</h2>
+      <p>For those with some experience, we'll delve into the foundational principles of AI systems.</p>
+      <p>Modern AI systems are built upon several core principles: machine learning, neural networks, and data processing. At their heart, these systems use algorithms to identify patterns in data and make predictions or decisions based on those patterns.</p>
+      <p>Key concepts include supervised learning (where models learn from labeled examples), unsupervised learning (finding hidden patterns in unlabeled data), and reinforcement learning (learning through trial and error with rewards).</p>
+    </div>
+  }
+  advancedContent={
+    <div>
+      <h2>Advanced AI Architecture</h2>
+      <p>Deep dive into the technical architecture of modern AI systems.</p>
+      <p>Contemporary AI systems leverage sophisticated architectures including transformer models, attention mechanisms, and large-scale distributed computing. The transformer architecture, introduced in "Attention Is All You Need," has become foundational for state-of-the-art models.</p>
+      <p>Technical considerations include:</p>
+      <ul>
+        <li>Computational graph optimization</li>
+        <li>Memory management during training</li>
+        <li>Parallel processing and distributed computation</li>
+        <li>Ethical constraints and bias mitigation</li>
+      </ul>
+    </div>
+  }
+/>
+
+export const ContentPersonalizer = require('@site/src/components/ContentPersonalizer').default;

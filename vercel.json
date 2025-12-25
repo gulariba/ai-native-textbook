@@ -8,15 +8,5 @@
         "distDir": "build"
       }
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/chat",
-      "destination": "/api/chat/route.js"
-    },
-    {
-      "source": "/api/chat/:path*",
-      "destination": "/api/chat/route.js"
-    }
   ]
 }

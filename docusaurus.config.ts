@@ -32,7 +32,18 @@ const config: Config = {
   // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', 'ur'],
+    localeConfigs: {
+      en: {
+        label: 'English',
+        direction: 'ltr',
+      },
+      ur: {
+        label: 'اردو',
+        direction: 'rtl',
+        htmlLang: 'ur',
+      },
+    },
   },
 
   presets: [
@@ -95,6 +106,10 @@ const config: Config = {
         },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
+          type: 'localeDropdown',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/your-org/ai-native-textbook',
           label: 'GitHub',
           position: 'right',
@@ -111,6 +126,25 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
     },
   } satisfies Preset.ThemeConfig,
+  plugins: [
+    async function myPlugin(context, options) {
+      return {
+        name: 'docusaurus-personalization-plugin',
+        configureWebpack(config, isServer) {
+          return {
+            resolve: {
+              alias: {
+                path: require.resolve('path-browserify'),
+              },
+            },
+          };
+        },
+      };
+    },
+  ],
+  clientModules: [
+    './src/client.js',
+  ],
 };
 
 export default config;

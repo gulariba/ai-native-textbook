@@ -18,7 +18,7 @@ This guide provides step-by-step instructions to set up, configure, and run the 
   - 4+ CPU cores recommended
   - 2GB+ available disk space
 - **Access Keys** (for full functionality):
-  - OpenAI API key (or alternative LLM provider)
+  - OpenRouter API key for LLM access
   - Vector database account (ChromaDB/Pinecone/Weaviate)
   - Cloud storage account (for deployment)
 
@@ -76,8 +76,8 @@ Create `.env` files in both backend and frontend directories:
 **Backend `.env`**:
 ```env
 # LLM Configuration
-LLM_PROVIDER=openai  # or anthropic, huggingface
-OPENAI_API_KEY=your_openai_key_here
+LLM_PROVIDER=openrouter  # or openai, anthropic, huggingface
+OPENROUTER_API_KEY=your_openrouter_key_here
 ANTHROPIC_API_KEY=your_anthropic_key_here
 
 # Vector Database Configuration

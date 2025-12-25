@@ -1,8 +1,0 @@
-{
-  "label": "Book Chapters",
-  "position": 2,
-  "link": {
-    "type": "generated-index",
-    "description": "Explore the chapters of our AI-native development book."
-  }
-}
