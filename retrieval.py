@@ -18,17 +18,29 @@ qdrant_client = QdrantClient(
     api_key=os.getenv("QDRANT_API_KEY"),
 )
 
-# Initialize embedding model
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+# Initialize embedding model variable (will be loaded on first use)
+_embedding_model = None
+
+def get_embedding_model():
+    """
+    Lazy load the embedding model on first use to reduce cold start time
+    """
+    global _embedding_model
+    if _embedding_model is None:
+        _embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+    return _embedding_model
 
 def get_relevant_chunks(query: str, top_k: int = 3):
     """
     Retrieve the most relevant chunks for a given query using Qdrant
     """
     try:
+        # Get or load embedding model
+        embedding_model = get_embedding_model()
+
         # Create embedding for the query
         query_embedding = embedding_model.encode([query])[0].tolist()
-        
+
         # Search in Qdrant for similar vectors
         search_result = qdrant_client.search(
             collection_name="documents",
@@ -36,7 +48,7 @@ def get_relevant_chunks(query: str, top_k: int = 3):
             limit=top_k,
             with_payload=True
         )
-        
+
         # Extract the content from the results
         relevant_chunks = []
         for result in search_result:
@@ -46,7 +58,7 @@ def get_relevant_chunks(query: str, top_k: int = 3):
                 "score": result.score
             }
             relevant_chunks.append(chunk)
-        
+
         return relevant_chunks
     except Exception as e:
         print(f"Error retrieving chunks: {e}")
@@ -57,11 +69,11 @@ def format_context_for_prompt(chunks):
     Format the retrieved chunks into a context string for the LLM prompt
     """
     context_parts = []
-    
+
     for i, chunk in enumerate(chunks):
         context_parts.append(f"Document {i+1}:")
         context_parts.append(f"Source: {chunk['file_path']}")
         context_parts.append(f"Content: {chunk['content'][:500]}...")  # Limit content length
         context_parts.append("---")
-    
+
     return "\n".join(context_parts)

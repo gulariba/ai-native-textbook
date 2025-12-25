@@ -28,6 +28,10 @@ async def root():
     return {"message": "Welcome to the Simple RAG Chatbot API"}
 
 
+# Global HTTP client instance to reuse connections
+http_client = httpx.AsyncClient(timeout=30.0)
+
+
 async def call_openrouter_api(message: str):
     """
     Call OpenRouter API with the provided message
@@ -53,14 +57,20 @@ async def call_openrouter_api(message: str):
         "temperature": 0.7
     }
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(url, headers=headers, json=data)
+    try:
+        response = await http_client.post(url, headers=headers, json=data)
 
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail=f"OpenRouter API error: {response.text}")
 
         result = response.json()
         return result["choices"][0]["message"]["content"]
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=500, detail=f"Request error: {str(e)}")
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="Request to OpenRouter API timed out")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 
 async def call_openrouter_with_rag(query: str, context: str):
@@ -97,6 +107,11 @@ async def chat(chat_request: ChatRequest):
 
 # For Vercel deployment
 app_instance = app
+
+# Properly close the HTTP client when the application shuts down
+@app.on_event("shutdown")
+async def shutdown_event():
+    await http_client.aclose()
 
 if __name__ == "__main__":
     import uvicorn
