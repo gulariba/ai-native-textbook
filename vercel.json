@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "functions": {
-    "vercel_api.py": {
-      "maxDuration": 60,
-      "memory": 1024,
-      "runtime": "python3.11"
+  "builds": [
+    {
+      "src": "vercel_api.py",
+      "use": "@vercel/python",
+      "config": { "runtime": "python3.9" }
     }
-  },
+  ],
   "routes": [
     {
       "src": "/(.*)",
