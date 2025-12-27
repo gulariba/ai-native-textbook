@@ -5,9 +5,9 @@
       "src": "vercel_api.py",
       "use": "@vercel/python",
       "config": {
-        "maxDuration": 60,
-        "memory": 1024,
-        "runtime": "python3.9"
+        "maxDuration": 300,
+        "memory": 3008,
+        "runtime": "python3.11"
       }
     }
   ],

@@ -12,11 +12,20 @@ import numpy as np
 # Load environment variables
 load_dotenv()
 
-# Initialize Qdrant client
-qdrant_client = QdrantClient(
-    url=os.getenv("QDRANT_URL"),
-    api_key=os.getenv("QDRANT_API_KEY"),
-)
+# Global variable for Qdrant client (will be initialized on first use)
+_qdrant_client = None
+
+def get_qdrant_client():
+    """
+    Lazy load the Qdrant client on first use to avoid connection attempts during build time
+    """
+    global _qdrant_client
+    if _qdrant_client is None:
+        _qdrant_client = QdrantClient(
+            url=os.getenv("QDRANT_URL"),
+            api_key=os.getenv("QDRANT_API_KEY"),
+        )
+    return _qdrant_client
 
 # Initialize embedding model variable (will be loaded on first use)
 _embedding_model = None
@@ -40,6 +49,9 @@ def get_relevant_chunks(query: str, top_k: int = 3):
 
         # Create embedding for the query
         query_embedding = embedding_model.encode([query])[0].tolist()
+
+        # Get or initialize Qdrant client
+        qdrant_client = get_qdrant_client()
 
         # Search in Qdrant for similar vectors
         search_result = qdrant_client.search(
